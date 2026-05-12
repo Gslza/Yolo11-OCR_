@@ -1,0 +1,26 @@
+[
+  {
+    "name": "FANTA",
+    "aliases": ["FANTA", "FANTA ORANGE", "FANTA STRAWBERRY", "FANT4", "F4NTA"],
+    "sugar_g": 23,
+    "status": "Tidak Disarankan"
+  },
+  {
+    "name": "COCA COLA",
+    "aliases": ["COCA COLA", "COCACOLA", "COKE", "COCA-COLA", "COCA C0LA"],
+    "sugar_g": 39,
+    "status": "Tidak Disarankan"
+  },
+  {
+    "name": "TEH BOTOL",
+    "aliases": ["TEH BOTOL", "TEHBOTOL", "SOSRO", "TEH BOTOL SOSRO", "TEH B0TOL"],
+    "sugar_g": 18,
+    "status": "Batas Wajar"
+  },
+  {
+    "name": "SPRITE",
+    "aliases": ["SPRITE", "SPR1TE", "SPRlTE", "SPRITE LEMON"],
+    "sugar_g": 38,
+    "status": "Tidak Disarankan"
+  }
+]
