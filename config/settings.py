@@ -1,4 +1,4 @@
-"""Application settings for the Smart Beverage Detection System."""
+"""Central configuration for the YOLO11 + EasyOCR beverage detector."""
 
 from pathlib import Path
 
@@ -12,28 +12,28 @@ OUTPUT_DIR = BASE_DIR / "output"
 
 # Camera settings
 CAMERA_INDEX = 0
-FRAME_WIDTH = 1280
-FRAME_HEIGHT = 720
-WINDOW_NAME = "Smart Beverage Detection System"
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
+WINDOW_NAME = "YOLO11 EasyOCR Beverage Detection"
 
 # YOLO inference settings
-CONFIDENCE_THRESHOLD = 0.80
-TARGET_CLASS_NAME = "bottle"
+CONFIDENCE_THRESHOLD = 0.60
 IOU_THRESHOLD = 0.45
-
-# Runtime behaviour
-FREEZE_DURATION_SECONDS = 4
-DETECTION_COOLDOWN_SECONDS = 4
-SCREENSHOT_ENABLED = True
+TARGET_CLASS_NAME = "bottle"
 
 # OCR settings
 OCR_LANGUAGES = ["en"]
 OCR_GPU = False
-OCR_MIN_CONFIDENCE = 0.20
+OCR_MIN_CONFIDENCE = 0.40
 OCR_RESIZE_WIDTH = 640
 
 # Product matching settings
 FUZZY_MATCH_THRESHOLD = 0.72
+
+# Runtime behavior
+DETECTION_COOLDOWN_SECONDS = 3
+FREEZE_DURATION_SECONDS = 5
+SCREENSHOT_ENABLED = True
 
 # Sugar decision thresholds in grams
 SUGAR_SAFE_MAX_EXCLUSIVE = 10
