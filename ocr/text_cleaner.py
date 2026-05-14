@@ -14,26 +14,46 @@ GENERIC_WORDS = {
     "DRINK",
     "WATER",
     "SWEAT",
+    "MALT",
+    "CHOCO",
+    "SPARKLING",
 }
 
-_OCR_TOKEN_TRANSLATION = str.maketrans({"|": "I", "8": "B", "4": "A"})
+OCR_CORRECTIONS = {
+    "A8C": "ABC",
+    "C0CA": "COCA",
+    "C0LA": "COLA",
+    "G0LDA": "GOLDA",
+    "FANT4": "FANTA",
+    "F4NTA": "FANTA",
+    "GOLD4": "GOLDA",
+    "SPR1TE": "SPRITE",
+    "POCAR1": "POCARI",
+    "M1ZONE": "MIZONE",
+    "MIZ0NE": "MIZONE",
+    "M1LK": "MILK",
+    "B0TOL": "BOTOL",
+    "S4RI": "SARI",
+    "H4RUM": "HARUM",
+}
+
 _ZERO_CONTEXT_PATTERN = re.compile(r"(?<=[A-Z])0|0(?=[A-Z])")
 _ONE_CONTEXT_PATTERN = re.compile(r"(?<=[A-Z])1|1(?=[A-Z])")
 
 
 def normalize_text(text: str) -> str:
-    """Normalize OCR text while keeping numbers that may be part of product names.
+    """Normalize OCR text to uppercase words and fix common OCR confusions."""
+    uppercase = str(text or "").upper().replace("|", "I")
+    alphanumeric_spaces = re.sub(r"[^A-Z0-9\s]", " ", uppercase)
+    compacted = re.sub(r"\s+", " ", alphanumeric_spaces).strip()
 
-    The function fixes common label OCR mistakes in a conservative way: ``0`` and
-    ``1`` are only converted when adjacent to letters, while ``4`` and ``8`` are
-    converted because they frequently represent ``A`` and ``B`` in beverage brand
-    words such as ``FANT4`` and ``A8C``.
-    """
-    uppercase = str(text or "").upper().translate(_OCR_TOKEN_TRANSLATION)
-    letter_context_fixed = _ZERO_CONTEXT_PATTERN.sub("O", uppercase)
-    letter_context_fixed = _ONE_CONTEXT_PATTERN.sub("I", letter_context_fixed)
-    alphanumeric_spaces = re.sub(r"[^A-Z0-9\s]", " ", letter_context_fixed)
-    return re.sub(r"\s+", " ", alphanumeric_spaces).strip()
+    corrected_words = [OCR_CORRECTIONS.get(word, word) for word in compacted.split()]
+    corrected = " ".join(corrected_words)
+    corrected = _ZERO_CONTEXT_PATTERN.sub("O", corrected)
+    corrected = _ONE_CONTEXT_PATTERN.sub("I", corrected)
+    corrected = corrected.replace("8", "B").replace("4", "A")
+    corrected_words = [OCR_CORRECTIONS.get(word, word) for word in corrected.split()]
+    return re.sub(r"\s+", " ", " ".join(corrected_words)).strip()
 
 
 def is_text_too_generic(text: str) -> bool:

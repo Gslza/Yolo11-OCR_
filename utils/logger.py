@@ -10,11 +10,13 @@ from typing import Mapping
 
 LOG_COLUMNS = [
     "timestamp",
-    "confidence",
-    "ocr_text",
     "product_name",
+    "ocr_text",
     "sugar_g",
     "status",
+    "yolo_confidence",
+    "match_score",
+    "match_type",
     "screenshot_path",
 ]
 
@@ -45,11 +47,13 @@ class DetectionLogger:
         """Write one detection row containing YOLO, OCR, product, and decision data."""
         row = {
             "timestamp": datetime.now().isoformat(timespec="seconds"),
-            "confidence": f"{confidence:.4f}",
-            "ocr_text": result.get("ocr_text", ""),
             "product_name": result.get("name", ""),
+            "ocr_text": result.get("ocr_text", ""),
             "sugar_g": result.get("sugar_g", ""),
             "status": result.get("status", ""),
+            "yolo_confidence": f"{confidence:.4f}",
+            "match_score": result.get("match_score", ""),
+            "match_type": result.get("match_type", ""),
             "screenshot_path": str(screenshot_path or ""),
         }
         with self.log_path.open("a", newline="", encoding="utf-8") as log_file:

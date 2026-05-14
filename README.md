@@ -9,11 +9,12 @@ Project ini menjalankan pipeline **YOLO11 + EasyOCR** untuk mendeteksi botol min
 3. YOLO mendeteksi objek `bottle` pada setiap frame.
 4. Sistem memilih bounding box botol dengan confidence terbaik.
 5. Crop area botol secara aman agar koordinat tidak keluar frame.
-6. EasyOCR membaca teks label dari crop.
-7. Teks OCR dibersihkan oleh `ocr/text_cleaner.py`.
-8. `ocr/product_matcher.py` mencocokkan teks ke `database/beverages.json` menggunakan exact matching dan fuzzy matching.
-9. OpenCV menampilkan bounding box, OCR text, nama produk, kadar gula, status, confidence YOLO, dan FPS.
-10. Jika produk dikenali, frame di-freeze beberapa detik, screenshot disimpan, dan log deteksi ditulis.
+6. EasyOCR membaca crop asli dan crop yang diputar 90, 180, dan 270 derajat.
+7. Sistem memilih hasil OCR terbaik berdasarkan jumlah kata valid dan total confidence.
+8. Teks OCR dibersihkan oleh `ocr/text_cleaner.py`.
+9. `ocr/product_matcher.py` mencocokkan teks ke `database/beverages.json` menggunakan exact matching dan fuzzy matching yang aman.
+10. OpenCV menampilkan bounding box, OCR text, nama produk, kadar gula, status, confidence YOLO, dan FPS.
+11. Jika produk dikenali, frame di-freeze beberapa detik, screenshot disimpan, dan log deteksi ditulis.
 
 ## Struktur Folder
 
@@ -120,7 +121,7 @@ Pengaturan utama ada di `config/settings.py`.
 | --- | --- | --- |
 | `MODEL_PATH` | `model/best.pt` | Path model YOLO11 |
 | `DATABASE_PATH` | `database/beverages.json` | Path database produk |
-| `CAMERA_INDEX` | `0` | Index webcam OpenCV |
+| `CAMERA_INDEX` | `1` | Index webcam OpenCV |
 | `FRAME_WIDTH` / `FRAME_HEIGHT` | `640` / `480` | Resolusi webcam |
 | `CONFIDENCE_THRESHOLD` | `0.60` | Minimum confidence YOLO |
 | `IOU_THRESHOLD` | `0.45` | Threshold IoU YOLO |
@@ -128,6 +129,8 @@ Pengaturan utama ada di `config/settings.py`.
 | `OCR_LANGUAGES` | `["en"]` | Bahasa OCR Latin label minuman |
 | `OCR_GPU` | `False` | EasyOCR CPU by default |
 | `OCR_MIN_CONFIDENCE` | `0.40` | Minimum confidence OCR per kata |
+| `OCR_ROTATION_ENABLED` | `True` | Aktifkan OCR pada crop asli dan rotasi |
+| `OCR_ROTATION_ANGLES` | `[0, 90, 180, 270]` | Sudut OCR untuk label horizontal, vertikal, dan terbalik |
 | `FUZZY_MATCH_THRESHOLD` | `0.72` | Ambang fuzzy matching |
 | `DETECTION_COOLDOWN_SECONDS` | `3` | Jeda agar OCR tidak berjalan setiap frame |
 | `FREEZE_DURATION_SECONDS` | `5` | Durasi freeze saat produk dikenali |
@@ -137,11 +140,20 @@ Pengaturan utama ada di `config/settings.py`.
 
 - **Window OpenCV** menampilkan bounding box botol, confidence YOLO, FPS, OCR text, nama produk, kadar gula, status, dan banner freeze.
 - **Screenshot** produk dikenali disimpan ke folder `screenshot/`.
-- **Log CSV** disimpan ke folder `logs/` dengan kolom timestamp, nama produk, OCR text, gula, status, confidence YOLO, dan path screenshot.
+- **Log CSV** disimpan ke folder `logs/` dengan kolom timestamp, nama produk, OCR text, gula, status, confidence YOLO, match score, match type, dan path screenshot.
+
+## Fitur OCR Rotation
+
+Label botol kadang terlihat tegak/vertikal, misalnya tulisan **TEBS** yang diputar 90 derajat. `BeverageOCR` mencoba OCR pada sudut `0`, `90`, `180`, dan `270` derajat, lalu memilih hasil dengan jumlah kata valid terbanyak. Jika jumlah kata sama, hasil dengan total confidence OCR tertinggi dipakai. Dengan cara ini teks horizontal, vertikal dari bawah ke atas, vertikal dari atas ke bawah, dan teks terbalik 180 derajat tetap punya peluang terbaca.
+
+## Fitur Text Cleaning
+
+`ocr/text_cleaner.py` mengubah teks menjadi uppercase, menghapus simbol yang tidak diperlukan, merapikan spasi, dan memperbaiki salah baca umum seperti `A8C`, `C0CA`, `C0LA`, `G0LDA`, `FANT4`, dan `SPR1TE`. Modul ini juga menandai teks yang terlalu umum, sehingga OCR yang hanya membaca `COFFEE`, `TEA`, `MILK`, `WATER`, atau `DRINK` tidak langsung dipilih sebagai produk tertentu.
 
 ## Catatan Matching OCR
 
 - `A8C` dinormalisasi menjadi `ABC` dan cocok ke **ABC COFFEE**.
 - `G0LDA` dinormalisasi menjadi `GOLDA` dan cocok ke **GOLDA**.
 - `C0CA C0LA` dinormalisasi menjadi `COCA COLA`.
+- `TEBS`, `TEBS TEA`, atau `TEBS SPARKLING` cocok ke **TEBS**.
 - OCR yang hanya berisi kata umum seperti `COFFEE` atau `TEA` akan ditampilkan sebagai **Tidak dikenali**.

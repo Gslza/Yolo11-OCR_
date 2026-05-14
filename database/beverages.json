@@ -1,62 +1,138 @@
 [
   {
     "name": "FANTA",
-    "aliases": ["FANTA", "FANTA ORANGE", "FANTA STRAWBERRY", "FANT4", "F4NTA"],
+    "aliases": [
+      "FANTA",
+      "FANTA ORANGE",
+      "FANTA STRAWBERRY",
+      "FANT4",
+      "F4NTA"
+    ],
     "sugar_g": 23
   },
   {
     "name": "COCA COLA",
-    "aliases": ["COCA COLA", "COCACOLA", "COKE", "COCA-COLA", "COCA C0LA", "C0CA C0LA"],
+    "aliases": [
+      "COCA COLA",
+      "COCACOLA",
+      "COKE",
+      "COCA-COLA",
+      "COCA C0LA",
+      "C0CA C0LA"
+    ],
     "sugar_g": 39
   },
   {
     "name": "TEH BOTOL",
-    "aliases": ["TEH BOTOL", "TEHBOTOL", "SOSRO", "TEH BOTOL SOSRO", "TEH B0TOL"],
+    "aliases": [
+      "TEH BOTOL",
+      "TEHBOTOL",
+      "SOSRO",
+      "TEH BOTOL SOSRO",
+      "TEH B0TOL"
+    ],
     "sugar_g": 18
   },
   {
     "name": "SPRITE",
-    "aliases": ["SPRITE", "SPR1TE", "SPRITE LEMON"],
+    "aliases": [
+      "SPRITE",
+      "SPR1TE",
+      "SPRITE LEMON"
+    ],
     "sugar_g": 38
   },
   {
     "name": "POCARI SWEAT",
-    "aliases": ["POCARI SWEAT", "POCARISWEAT", "POCARI-SWEAT", "POCAR1 SWEAT"],
+    "aliases": [
+      "POCARI SWEAT",
+      "POCARISWEAT",
+      "POCARI-SWEAT",
+      "POCAR1 SWEAT"
+    ],
     "sugar_g": 6
   },
   {
     "name": "ULTRA MILK",
-    "aliases": ["ULTRA MILK", "ULTRAMILK", "ULTRA-MILK", "ULTRA M1LK"],
+    "aliases": [
+      "ULTRA MILK",
+      "ULTRAMILK",
+      "ULTRA-MILK",
+      "ULTRA M1LK"
+    ],
     "sugar_g": 12
   },
   {
     "name": "ABC COFFEE",
-    "aliases": ["ABC", "A8C", "ABC COFFEE", "ABC CHOCO MALT COFFEE", "CHOCO MALT COFFEE"],
+    "aliases": [
+      "ABC",
+      "A8C",
+      "ABC COFFEE",
+      "ABC CHOCO MALT COFFEE",
+      "CHOCO MALT COFFEE"
+    ],
     "sugar_g": 17
   },
   {
     "name": "GOLDA",
-    "aliases": ["GOLDA", "GOLDA COFFEE", "GOLD4", "GOLD4 COFFEE", "G0LDA"],
+    "aliases": [
+      "GOLDA",
+      "GOLDA COFFEE",
+      "GOLD4",
+      "GOLD4 COFFEE",
+      "G0LDA"
+    ],
     "sugar_g": 15
   },
   {
     "name": "FRESTEA",
-    "aliases": ["FRESTEA", "FRES TEA", "FRESTEA TEA", "FREESTEA"],
+    "aliases": [
+      "FRESTEA",
+      "FRES TEA",
+      "FRESTEA TEA",
+      "FREESTEA"
+    ],
     "sugar_g": 15
   },
   {
     "name": "ADEM SARI",
-    "aliases": ["ADEM SARI", "ADEMSARI", "ADEM-SARI", "ADEM S4RI"],
+    "aliases": [
+      "ADEM SARI",
+      "ADEMSARI",
+      "ADEM-SARI",
+      "ADEM S4RI"
+    ],
     "sugar_g": 8
   },
   {
     "name": "MIZONE",
-    "aliases": ["MIZONE", "M1ZONE", "MIZ0NE", "MIZONE SPORT DRINK"],
+    "aliases": [
+      "MIZONE",
+      "M1ZONE",
+      "MIZ0NE",
+      "MIZONE SPORT DRINK"
+    ],
     "sugar_g": 7
   },
   {
     "name": "TEH PUCUK HARUM",
-    "aliases": ["TEH PUCUK HARUM", "TEHPUCUKHARUM", "TEH-PUCUK-HARUM", "TEH PUCUK H4RUM"],
+    "aliases": [
+      "TEH PUCUK HARUM",
+      "TEHPUCUKHARUM",
+      "TEH-PUCUK-HARUM",
+      "TEH PUCUK H4RUM"
+    ],
     "sugar_g": 15
+  },
+  {
+    "name": "TEBS",
+    "aliases": [
+      "TEBS",
+      "TEB",
+      "TEBS TEA",
+      "TEBS SPARKLING",
+      "TEBS SPARKLING TEA"
+    ],
+    "sugar_g": 20
   }
 ]

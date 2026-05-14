@@ -30,7 +30,7 @@ def ensure_runtime_paths() -> None:
             "Letakkan file best.pt pada folder model/."
         )
     if not settings.DATABASE_PATH.exists():
-        raise FileNotFoundError(f"Database produk tidak ditemukan di {settings.DATABASE_PATH}.")
+        print(f"[WARN] Database produk tidak ditemukan di {settings.DATABASE_PATH}; matching akan dinonaktifkan.")
 
 
 def open_camera() -> cv2.VideoCapture:
@@ -120,6 +120,7 @@ def process_frame(
             last_ocr_time = now
             recognized_now = bool(result and result.get("name") != "Tidak dikenali")
         else:
+            last_ocr_time = now
             result = {
                 "name": "Tidak dikenali",
                 "sugar_g": "-",

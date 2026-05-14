@@ -16,6 +16,7 @@ SPECIFIC_BRAND_KEYWORDS = (
     "GOLDA",
     "FANTA",
     "COCA",
+    "COLA",
     "COKE",
     "SPRITE",
     "POCARI",
@@ -25,6 +26,7 @@ SPECIFIC_BRAND_KEYWORDS = (
     "FRESTEA",
     "ADEM",
     "PUCUK",
+    "TEBS",
 )
 
 
@@ -35,6 +37,7 @@ class Beverage:
     name: str
     aliases: tuple[str, ...]
     sugar_g: float
+    status: str
 
 
 def decide_status(sugar_g: float) -> str:
@@ -49,7 +52,8 @@ def decide_status(sugar_g: float) -> str:
 def load_beverage_database(database_path: Path = settings.DATABASE_PATH) -> list[Beverage]:
     """Load and validate the beverage database JSON list."""
     if not database_path.exists():
-        raise FileNotFoundError(f"Database produk tidak ditemukan: {database_path}")
+        print(f"Peringatan: database produk tidak ditemukan: {database_path}")
+        return []
 
     with database_path.open("r", encoding="utf-8") as database_file:
         raw_data: Any = json.load(database_file)
@@ -68,9 +72,13 @@ def load_beverage_database(database_path: Path = settings.DATABASE_PATH) -> list
             raise ValueError(f"Field aliases item ke-{index} harus berupa list.")
 
         name = normalize_text(str(item["name"]))
-        aliases = tuple(normalize_text(str(alias)) for alias in item["aliases"] if normalize_text(str(alias)))
+        aliases = tuple(
+            alias_text
+            for alias in item["aliases"]
+            if (alias_text := normalize_text(str(alias)))
+        )
         sugar_g = float(item["sugar_g"])
-        beverages.append(Beverage(name=name, aliases=aliases, sugar_g=sugar_g))
+        beverages.append(Beverage(name=name, aliases=aliases, sugar_g=sugar_g, status=decide_status(sugar_g)))
     return beverages
 
 
@@ -89,7 +97,7 @@ class ProductMatcher:
         exact_match = self._exact_match(ocr_text)
         if exact_match is not None:
             beverage, term = exact_match
-            return self._to_result(beverage, ocr_text, 1.0, f"exact:{term}")
+            return self._to_result(beverage, ocr_text, 1.0, "exact" if term == beverage.name else f"exact:{term}")
 
         best_brand_match = self._specific_brand_match(ocr_text)
         if best_brand_match is not None:
@@ -146,7 +154,7 @@ class ProductMatcher:
         return {
             "name": beverage.name,
             "sugar_g": beverage.sugar_g,
-            "status": decide_status(beverage.sugar_g),
+            "status": beverage.status,
             "ocr_text": ocr_text,
             "match_score": round(score, 4),
             "match_type": match_type,
