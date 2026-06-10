@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import platform
 import sys
+import threading
 import time
 from typing import Sequence
 
@@ -91,52 +92,91 @@ def find_best_bottle_detection(model: YOLO, frame: np.ndarray) -> tuple[list[flo
     return best_detection
 
 
+class OCRWorker:
+    """Run OCR analysis in a background thread so the camera loop stays responsive."""
+
+    def __init__(self, ocr_engine: BeverageOCR) -> None:
+        self._engine = ocr_engine
+        self._thread: threading.Thread | None = None
+        self._result: dict[str, object] | None = None
+        self._lock = threading.Lock()
+        self._busy = False
+        self._last_submit_time = 0.0
+
+    @property
+    def busy(self) -> bool:
+        with self._lock:
+            return self._busy
+
+    def submit(self, crop: np.ndarray) -> None:
+        """Send a crop for background OCR if the worker is idle and cooldown elapsed."""
+        now = time.monotonic()
+        if self.busy or (now - self._last_submit_time) < settings.DETECTION_COOLDOWN_SECONDS:
+            return
+        self._last_submit_time = now
+        with self._lock:
+            self._busy = True
+            self._result = None
+        thread = threading.Thread(target=self._run, args=(crop.copy(),), daemon=True)
+        thread.start()
+
+    def _run(self, crop: np.ndarray) -> None:
+        try:
+            result = self._engine.analyze_crop(crop)
+            with self._lock:
+                self._result = result
+        finally:
+            with self._lock:
+                self._busy = False
+
+    def collect(self) -> dict[str, object] | None:
+        """Return the completed OCR result and clear it, or None if not ready."""
+        with self._lock:
+            result = self._result
+            self._result = None
+            return result
+
+
 def process_frame(
     frame: np.ndarray,
     model: YOLO,
-    ocr_engine: BeverageOCR,
+    ocr_worker: OCRWorker,
     logger: DetectionLogger,
-    last_ocr_time: float,
     last_result: dict[str, object] | None,
-) -> tuple[np.ndarray, dict[str, object] | None, float | None, float, bool]:
-    """Run YOLO every frame and OCR only when the cooldown has elapsed."""
+) -> tuple[np.ndarray, dict[str, object] | None, float | None, bool]:
+    """Run YOLO every frame; OCR runs in a background thread without blocking."""
     rendered = frame.copy()
-    now = time.monotonic()
     detection = find_best_bottle_detection(model, frame)
 
     if detection is None:
-        return draw_info_panel(rendered, None), None, None, last_ocr_time, False
+        return draw_info_panel(rendered, None), None, None, False
 
     bbox, confidence = detection
     draw_bounding_box(rendered, bbox, confidence, settings.TARGET_CLASS_NAME)
 
+    # Collect any completed background OCR result
     result = last_result
     recognized_now = False
-    cooldown_finished = now - last_ocr_time >= settings.DETECTION_COOLDOWN_SECONDS
-    if cooldown_finished:
-        crop = safe_crop(frame, bbox)
-        if crop is not None:
-            result = ocr_engine.analyze_crop(crop)
-            last_ocr_time = now
-            recognized_now = bool(result and result.get("name") != "Tidak dikenali")
-        else:
-            last_ocr_time = now
-            result = {
-                "name": "Tidak dikenali",
-                "sugar_g": "-",
-                "status": "Tidak dikenali",
-                "ocr_text": "",
-                "match_score": 0.0,
-                "match_type": "empty_crop",
-            }
+    ocr_result = ocr_worker.collect()
+    if ocr_result is not None:
+        result = ocr_result
+        recognized_now = bool(result.get("name") != "Tidak dikenali")
+
+    # Submit a new OCR job when the worker is idle (cooldown enforced internally)
+    crop = safe_crop(frame, bbox)
+    if crop is not None:
+        ocr_worker.submit(crop)
 
     rendered = draw_info_panel(rendered, result, confidence)
     if recognized_now and result is not None:
         screenshot_path = None
         if settings.SCREENSHOT_ENABLED:
             screenshot_path = save_detection_screenshot(rendered, settings.SCREENSHOT_DIR, str(result["name"]))
+            if isinstance(result, dict) and screenshot_path:
+                result["screenshot_path"] = str(screenshot_path)
+                result["screenshot_filename"] = screenshot_path.name
         logger.log_detection(confidence, result, screenshot_path)
-    return rendered, result, confidence, last_ocr_time, recognized_now
+    return rendered, result, confidence, recognized_now
 
 
 def main() -> int:
@@ -146,10 +186,10 @@ def main() -> int:
         ensure_runtime_paths()
         model = YOLO(str(settings.MODEL_PATH))
         ocr_engine = BeverageOCR(settings.DATABASE_PATH)
+        ocr_worker = OCRWorker(ocr_engine)
         logger = DetectionLogger(settings.LOG_DIR)
         capture = open_camera()
 
-        last_ocr_time = 0.0
         last_result: dict[str, object] | None = None
         freeze_until = 0.0
         freeze_frame: np.ndarray | None = None
@@ -173,12 +213,11 @@ def main() -> int:
                 if not ok:
                     raise RuntimeError("Gagal membaca frame dari kamera.")
 
-                display_frame, product, _, last_ocr_time, recognized_now = process_frame(
+                display_frame, product, _, recognized_now = process_frame(
                     frame,
                     model,
-                    ocr_engine,
+                    ocr_worker,
                     logger,
-                    last_ocr_time,
                     last_result,
                 )
                 last_result = product

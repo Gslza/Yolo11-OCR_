@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beverage Sugar Detection Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥤</text></svg>">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <div class="header-logo">🥤</div>
+        <h1>Beverage detection <span>YOLO11 & EasyOCR</span></h1>
+      </div>
+      <div id="connection-badge" class="connection-badge disconnected">
+        <span class="connection-dot"></span>
+        <span id="connection-status-text">Disconnected</span>
+      </div>
+    </header>
+
+    <!-- Stats Row -->
+    <section class="stats-row">
+      <div class="stat-card total">
+        <div class="stat-label">Total Deteksi</div>
+        <div id="stat-total" class="stat-value">0</div>
+      </div>
+      <div class="stat-card safe">
+        <div class="stat-label">Kategori Aman</div>
+        <div id="stat-safe" class="stat-value">0</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">Batas Wajar</div>
+        <div id="stat-warning" class="stat-value">0</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-label">Tidak Disarankan</div>
+        <div id="stat-danger" class="stat-value">0</div>
+      </div>
+    </section>
+
+    <!-- Main Grid -->
+    <main class="main-grid">
+      <!-- Left Column: Video Feed -->
+      <section class="card video-card">
+        <div class="card-header">
+          <div class="card-header-icon">🎥</div>
+          <h2>Live Camera Feed</h2>
+        </div>
+        <div class="card-body">
+          <div class="video-wrapper">
+            <div id="video-fps" class="video-fps">FPS: --</div>
+            <img id="video-stream" src="" alt="Live Feed" style="display: none;">
+            <div id="video-placeholder" class="video-placeholder">
+              <span class="video-placeholder-icon">📷</span>
+              <span>Menunggu koneksi kamera...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Detection Panel -->
+      <section class="card detection-card">
+        <div class="card-header">
+          <div class="card-header-icon">📊</div>
+          <h2>Hasil Deteksi</h2>
+        </div>
+        <div class="card-body">
+          <!-- Detection Status Banner -->
+          <div id="detection-status" class="detection-status idle">
+            <span class="detection-status-dot"></span>
+            <span id="detection-status-text">Idle</span>
+          </div>
+
+          <div class="product-info">
+            <!-- Product Name -->
+            <div id="product-name" class="product-name unknown">Menunggu Deteksi...</div>
+
+            <!-- Sugar Gauge -->
+            <div class="sugar-gauge">
+              <div class="sugar-gauge-label">
+                <span class="sugar-gauge-title">Kadar Gula</span>
+                <span id="sugar-value" class="sugar-gauge-value">-</span>
+              </div>
+              <div class="sugar-gauge-track">
+                <div id="sugar-gauge-fill" class="sugar-gauge-fill" style="width: 0%;"></div>
+              </div>
+              <div class="sugar-gauge-markers">
+                <span>0g</span>
+                <span>10g</span>
+                <span>20g</span>
+                <span>30g+</span>
+              </div>
+            </div>
+
+            <!-- OCR Text Box -->
+            <div class="info-item-label">Teks Terdeteksi (OCR)</div>
+            <div id="ocr-text-box" class="ocr-text-box">-</div>
+
+            <!-- Info Grid -->
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-item-label">YOLO Confidence</div>
+                <div id="info-yolo-conf" class="info-item-value">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">OCR Angle</div>
+                <div id="info-ocr-angle" class="info-item-value">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">Match Score</div>
+                <div id="info-match-score" class="info-item-value">-</div>
+              </div>
+              <div class="info-item">
+                <div class="info-item-label">Match Type</div>
+                <div id="info-match-type" class="info-item-value">-</div>
+              </div>
+            </div>
+            
+            <!-- Bounding Box / Screenshot Card -->
+            <div id="screenshot-container" class="screenshot-container" style="display: none; margin-top: 18px;">
+              <div class="info-item-label">Screenshot Layar Freeze</div>
+              <div class="screenshot-wrapper">
+                <img id="detection-screenshot" src="" alt="Screenshot Hasil Deteksi">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom: History -->
+    <section class="card history-card">
+      <div class="card-header">
+        <div class="card-header-icon">📜</div>
+        <h2>Riwayat Deteksi Terkini</h2>
+      </div>
+      <div class="card-body">
+        <div class="history-table-wrapper">
+          <table class="history-table" id="history-table" style="display: none;">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Nama Produk</th>
+                <th>Kadar Gula</th>
+                <th>Status</th>
+                <th>Confidence YOLO</th>
+                <th>Match Score</th>
+                <th>Match Type</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <!-- DYNAMIC CONTENT -->
+            </tbody>
+          </table>
+          <div id="history-empty" class="history-empty">
+            <div class="history-empty-icon">📂</div>
+            <div>Belum ada riwayat deteksi. Deteksi pertama Anda akan muncul di sini.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

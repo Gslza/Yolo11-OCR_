@@ -134,5 +134,269 @@
       "TEBS SPARKLING TEA"
     ],
     "sugar_g": 20
+  },
+  {
+    "name": "AQUA",
+    "aliases": [
+      "AQUA",
+      "AQU4",
+      "AQUA MINERAL",
+      "AIR MINERAL AQUA"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "LE MINERALE",
+    "aliases": [
+      "LE MINERALE",
+      "LEMINERALE",
+      "LE-MINERALE",
+      "LE MINER4LE"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "TEH KOTAK",
+    "aliases": [
+      "TEH KOTAK",
+      "TEHKOTAK",
+      "TEH-KOTAK",
+      "TEH K0TAK",
+      "ULTRAJAYA TEH KOTAK"
+    ],
+    "sugar_g": 16
+  },
+  {
+    "name": "GOOD DAY",
+    "aliases": [
+      "GOOD DAY",
+      "GOODDAY",
+      "GOOD-DAY",
+      "GOOD DAY COFFEE",
+      "G00D DAY"
+    ],
+    "sugar_g": 22
+  },
+  {
+    "name": "NESCAFE",
+    "aliases": [
+      "NESCAFE",
+      "NESCAF3",
+      "NESCAFE COFFEE",
+      "NESCAFE LATTE",
+      "NESCAFE ORIGINAL"
+    ],
+    "sugar_g": 18
+  },
+  {
+    "name": "FLORIDINA",
+    "aliases": [
+      "FLORIDINA",
+      "FLOR1DINA",
+      "FLORIDINA ORANGE",
+      "FL0RIDINA"
+    ],
+    "sugar_g": 14
+  },
+  {
+    "name": "MINUTE MAID",
+    "aliases": [
+      "MINUTE MAID",
+      "MINUTEMAID",
+      "MINUTE-MAID",
+      "MINUTE MAID PULPY",
+      "MINUTE MAID PULPY ORANGE",
+      "M1NUTE MAID"
+    ],
+    "sugar_g": 27
+  },
+  {
+    "name": "YOU C1000",
+    "aliases": [
+      "YOU C1000",
+      "YOUC1000",
+      "YOU-C1000",
+      "YOU C 1000",
+      "YOU C1000 VITAMIN"
+    ],
+    "sugar_g": 13
+  },
+  {
+    "name": "ICHITAN",
+    "aliases": [
+      "ICHITAN",
+      "1CHITAN",
+      "ICHITAN THAI TEA",
+      "ICH1TAN",
+      "ICHITAN TEA"
+    ],
+    "sugar_g": 16
+  },
+  {
+    "name": "ALE ALE",
+    "aliases": [
+      "ALE ALE",
+      "ALEALE",
+      "ALE-ALE",
+      "4LE 4LE",
+      "ALE ALE ORANGE"
+    ],
+    "sugar_g": 11
+  },
+  {
+    "name": "FRUIT TEA",
+    "aliases": [
+      "FRUIT TEA",
+      "FRUITTEA",
+      "FRUIT-TEA",
+      "FRUIT TEA SOSRO",
+      "FRU1T TEA"
+    ],
+    "sugar_g": 17
+  },
+  {
+    "name": "NU GREEN TEA",
+    "aliases": [
+      "NU GREEN TEA",
+      "NUGREENTEA",
+      "NU-GREEN-TEA",
+      "NU GREEN",
+      "NU GR33N TEA"
+    ],
+    "sugar_g": 15
+  },
+  {
+    "name": "BEAR BRAND",
+    "aliases": [
+      "BEAR BRAND",
+      "BEARBRAND",
+      "BEAR-BRAND",
+      "BEAR BR4ND",
+      "SUSU BERUANG",
+      "NESTLE BEAR BRAND"
+    ],
+    "sugar_g": 8
+  },
+  {
+    "name": "YAKULT",
+    "aliases": [
+      "YAKULT",
+      "Y4KULT",
+      "YAKUL7",
+      "YAKULT ORIGINAL"
+    ],
+    "sugar_g": 12
+  },
+  {
+    "name": "ORONAMIN C",
+    "aliases": [
+      "ORONAMIN C",
+      "ORONAMINC",
+      "ORONAMIN-C",
+      "0RONAMIN C",
+      "ORONAMIN"
+    ],
+    "sugar_g": 19
+  },
+  {
+    "name": "INDOMILK",
+    "aliases": [
+      "INDOMILK",
+      "INDO MILK",
+      "IND0MILK",
+      "INDOMILK SUSU",
+      "1NDOMILK"
+    ],
+    "sugar_g": 14
+  },
+  {
+    "name": "NU MILK TEA",
+    "aliases": [
+      "Nii MILK TEA",
+      "Nii MILKTEA",
+      "Nii-MILK-TEA",
+      "Nii MILK",
+      "Nii M1LK TEA"
+    ],
+    "sugar_g": 15
+  },
+  {
+    "name": "MILO",
+    "aliases": [
+      "MILO",
+      "MILO ACTIVE GO",
+      "MILO ACTIVE-GO",
+      "M1LO",
+      "MILO CAN"
+    ],
+    "sugar_g": 13
+  },
+  {
+    "name": "HYDRO COCO",
+    "aliases": [
+      "HYDRO COCO",
+      "HYDROCOCO",
+      "HYDRO-COCO",
+      "HYDRO C0C0",
+      "HYDRO COCO COCONUT WATER"
+    ],
+    "sugar_g": 10
+  },
+  {
+    "name": "CIMORY YOGURT",
+    "aliases": [
+      "CIMORY",
+      "CIMORY YOGURT",
+      "CIMORY YOGHURT",
+      "C1MORY",
+      "CIMORY YOGURT DRINK",
+      "CIMORY DRINK"
+    ],
+    "sugar_g": 16
+  },
+  {
+    "name": "KAPAL API",
+    "aliases": [
+      "KAPAL API",
+      "KAPALAPI",
+      "KAPAL API COFFEE",
+      "KAPAL AP1",
+      "KOPI KAPAL API"
+    ],
+    "sugar_g": 15
+  },
+  {
+    "name": "KOPIKO LUCKY DAY",
+    "aliases": [
+      "KOPIKO",
+      "KOPIKO LUCKY DAY",
+      "KOPIKO LUCKYDAY",
+      "LUCKY DAY",
+      "KOPIKO 78",
+      "KOPIKO 78C"
+    ],
+    "sugar_g": 16
+  },
+  {
+    "name": "TEH JAVANA",
+    "aliases": [
+      "JAVANA",
+      "TEH JAVANA",
+      "JAVANA TEA",
+      "JAVAN4",
+      "TEH JAVAN4"
+    ],
+    "sugar_g": 14
+  },
+  {
+    "name": "NUTRI BOOST",
+    "aliases": [
+      "NUTRI BOOST",
+      "NUTRIBOOST",
+      "NUTRI-BOOST",
+      "NSNS",
+      "BOOSI SUSU"
+    ],
+    "sugar_g": 21
   }
 ]

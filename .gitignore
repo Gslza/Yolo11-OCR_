@@ -7,12 +7,22 @@ ENV/
 # Python cache
 __pycache__/
 *.py[cod]
+*$py.class
 
-# File environment rahasia
+# Environment variables
 .env
+.env.*
 
-# VS Code
+# VS Code dan IDE
 .vscode/
+.idea/
 
-# Output sementara
+# Jupyter
+.ipynb_checkpoints/
+
+# Model/cache sementara
 *.log
+
+# Sistem operasi
+.DS_Store
+Thumbs.db

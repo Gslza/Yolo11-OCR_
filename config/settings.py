@@ -11,7 +11,7 @@ LOG_DIR = BASE_DIR / "logs"
 OUTPUT_DIR = BASE_DIR / "output"
 
 # Camera settings
-CAMERA_INDEX = 1
+CAMERA_INDEX = 0
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 WINDOW_NAME = "YOLO11 EasyOCR Beverage Detection"
@@ -40,3 +40,10 @@ SCREENSHOT_ENABLED = True
 # Sugar decision thresholds in grams
 SUGAR_SAFE_MAX_EXCLUSIVE = 10
 SUGAR_REASONABLE_MAX_INCLUSIVE = 20
+
+# Web dashboard settings
+WEB_HOST = "0.0.0.0"
+WEB_PORT = 5000
+WEB_DIR = BASE_DIR / "web"
+STREAM_QUALITY = 70  # JPEG quality for MJPEG stream (1-100)
+MAX_HISTORY = 50  # Max detection history entries to keep in memory
