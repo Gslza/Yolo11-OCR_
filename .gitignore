@@ -1,0 +1,18 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# File environment rahasia
+.env
+
+# VS Code
+.vscode/
+
+# Output sementara
+*.log
