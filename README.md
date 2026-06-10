@@ -1,159 +1,322 @@
-# YOLO11 EasyOCR Beverage Detection
+# YOLO11 + EasyOCR Beverage Sugar Detection
 
-Project ini menjalankan pipeline **YOLO11 + EasyOCR** untuk mendeteksi botol minuman dari webcam, membaca teks label, membersihkan hasil OCR, mencocokkan produk ke database JSON, lalu menampilkan kadar gula dan status keamanan konsumsi.
+Sistem **computer vision** untuk mendeteksi botol minuman menggunakan **YOLO11**, membaca teks pada label dengan **EasyOCR**, mencocokkan hasil OCR ke database produk, lalu menampilkan informasi kadar gula dan kategori konsumsi melalui aplikasi desktop OpenCV maupun dashboard web Flask.
 
-## Alur Sistem
+> Proyek penelitian: **Implementasi YOLO11 dan OCR untuk Identifikasi Botol Minuman serta Analisis Kadar Gula bagi Anak Berbasis Computer Vision**.
 
-1. Load model YOLO dari `model/best.pt`.
-2. Buka webcam dengan OpenCV.
-3. YOLO mendeteksi objek `bottle` pada setiap frame.
-4. Sistem memilih bounding box botol dengan confidence terbaik.
-5. Crop area botol secara aman agar koordinat tidak keluar frame.
-6. EasyOCR membaca crop asli dan crop yang diputar 90, 180, dan 270 derajat.
-7. Sistem memilih hasil OCR terbaik berdasarkan jumlah kata valid dan total confidence.
-8. Teks OCR dibersihkan oleh `ocr/text_cleaner.py`.
-9. `ocr/product_matcher.py` mencocokkan teks ke `database/beverages.json` menggunakan exact matching dan fuzzy matching yang aman.
-10. OpenCV menampilkan bounding box, OCR text, nama produk, kadar gula, status, confidence YOLO, dan FPS.
-11. Jika produk dikenali, frame di-freeze beberapa detik, screenshot disimpan, dan log deteksi ditulis.
+## Fitur Utama
 
-## Struktur Folder
+- Deteksi botol minuman secara real-time menggunakan YOLO11.
+- OCR label pada sudut `0°`, `90°`, `180°`, dan `270°`.
+- OCR berjalan pada background thread agar video kamera tetap responsif.
+- Normalisasi kesalahan pembacaan OCR, seperti `A8C`, `C0CA`, `G0LDA`, dan `FANT4`.
+- Exact matching dan fuzzy matching terhadap database produk JSON.
+- Informasi nama produk, kadar gula, status, confidence YOLO, dan match score.
+- Freeze frame otomatis ketika produk berhasil dikenali.
+- Screenshot hasil deteksi dan pencatatan riwayat ke file CSV.
+- Dua mode penggunaan:
+  - Aplikasi desktop melalui window OpenCV.
+  - Dashboard web real-time berbasis Flask, MJPEG, dan Server-Sent Events.
+
+## Alur Kerja Sistem
+
+```mermaid
+flowchart LR
+    A[Webcam] --> B[YOLO11 Detection]
+    B --> C[Bounding Box Botol]
+    C --> D[Safe Crop]
+    D --> E[EasyOCR Multi-Rotation]
+    E --> F[Text Cleaning]
+    F --> G[Product Matching]
+    G --> H[Database Minuman]
+    G --> I[Analisis Kadar Gula]
+    I --> J[Desktop OpenCV]
+    I --> K[Dashboard Flask]
+    I --> L[Screenshot dan Log CSV]
+```
+
+Proses utama sistem:
+
+1. Memuat model YOLO dari `model/best.pt`.
+2. Membuka webcam menggunakan OpenCV.
+3. Mendeteksi objek botol pada setiap frame.
+4. Memilih bounding box botol dengan confidence tertinggi.
+5. Memotong area botol tanpa melewati batas frame.
+6. Menjalankan EasyOCR pada crop asli dan hasil rotasi.
+7. Memilih hasil OCR terbaik berdasarkan kata valid dan confidence.
+8. Membersihkan teks melalui `ocr/text_cleaner.py`.
+9. Mencocokkan teks dengan `database/beverages.json`.
+10. Menampilkan hasil, menyimpan screenshot, dan menulis log CSV.
+
+## Struktur Proyek
 
 ```text
 .
 ├── config/
 │   ├── __init__.py
-│   └── settings.py              # Path, kamera, threshold YOLO/OCR, cooldown, freeze
+│   └── settings.py              # Konfigurasi kamera, YOLO, OCR, dan web
 ├── database/
 │   └── beverages.json           # Database produk, alias OCR, dan kadar gula
-├── logs/                        # Log CSV hasil deteksi
+├── logs/                        # Log hasil deteksi dalam format CSV
 ├── model/
-│   └── best.pt                  # Letakkan model YOLO11 terlatih di sini
+│   └── best.pt                  # Model YOLO11 hasil training
 ├── ocr/
 │   ├── __init__.py
-│   ├── reader.py                # Integrasi EasyOCR + ProductMatcher
-│   ├── text_cleaner.py          # Normalisasi OCR dan filter kata umum
-│   └── product_matcher.py       # Matching database dan decision status gula
+│   ├── reader.py                # Integrasi EasyOCR dan ProductMatcher
+│   ├── text_cleaner.py          # Normalisasi dan pembersihan teks OCR
+│   └── product_matcher.py       # Exact/fuzzy matching dan kategori gula
 ├── output/                      # Folder output tambahan
-├── screenshot/                  # Screenshot otomatis produk dikenali
+├── screenshot/                  # Screenshot otomatis hasil deteksi
 ├── utils/
 │   ├── __init__.py
-│   ├── display.py               # Overlay OpenCV, FPS, panel info, freeze banner
-│   ├── logger.py                # Logger CSV
-│   └── screenshot.py            # Penyimpanan screenshot aman
-├── detect.py                    # Entry point real-time webcam
-├── README.md
-└── requirements.txt
+│   ├── display.py               # Bounding box, panel informasi, FPS, dan freeze
+│   ├── logger.py                # Pencatatan deteksi ke CSV
+│   └── screenshot.py            # Penyimpanan screenshot
+├── web/
+│   ├── index.html               # Struktur dashboard
+│   ├── style.css                # Tampilan dashboard
+│   └── script.js                # Live stream, SSE, statistik, dan riwayat
+├── app.py                       # Backend dan dashboard Flask
+├── detect.py                    # Aplikasi desktop OpenCV
+├── requirements.txt
+└── README.md
 ```
+
+## Persyaratan
+
+- Python 3.10 atau lebih baru.
+- Webcam internal atau eksternal.
+- Sistem operasi Windows, Linux, atau macOS.
+- Pencahayaan yang cukup agar label minuman terbaca.
+
+Dependensi utama:
+
+- `ultralytics`
+- `easyocr`
+- `opencv-python`
+- `numpy`
+- `flask`
 
 ## Instalasi
 
-Gunakan Python 3.10+ jika memungkinkan.
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Pada Windows PowerShell:
+### Windows PowerShell
 
 ```powershell
+git clone https://github.com/Gslza/Yolo11-OCR_.git
+cd Yolo11-OCR_
+
 python -m venv .venv
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Model YOLO
+Apabila aktivasi virtual environment diblokir oleh PowerShell, jalankan:
 
-File model tidak disertakan di repository. Letakkan model YOLO11 hasil training dengan nama berikut:
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### Linux atau macOS
+
+```bash
+git clone https://github.com/Gslza/Yolo11-OCR_.git
+cd Yolo11-OCR_
+
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Model YOLO11
+
+Model yang digunakan berada pada:
 
 ```text
 model/best.pt
 ```
 
-Aplikasi akan berhenti dengan pesan error yang jelas jika file tersebut belum tersedia.
+Repository saat ini telah menyediakan file tersebut. Apabila model diganti, gunakan nama `best.pt` atau sesuaikan nilai `MODEL_PATH` pada `config/settings.py`.
 
 ## Menjalankan Program
 
-Jalankan dari root repository:
+### Mode Desktop OpenCV
 
 ```bash
 python detect.py
 ```
 
-Kontrol:
+Window OpenCV akan menampilkan video kamera, bounding box, FPS, teks OCR, nama produk, kadar gula, status, dan nilai confidence.
 
-- Arahkan label botol ke kamera.
-- Pastikan pencahayaan cukup dan label terlihat jelas.
-- Tekan tombol `q` pada window OpenCV untuk keluar.
+Tekan tombol `q` pada window OpenCV untuk menghentikan program.
+
+### Mode Dashboard Web
+
+```bash
+python app.py
+```
+
+Buka alamat berikut melalui browser:
+
+```text
+http://localhost:5000
+```
+
+Dashboard menampilkan:
+
+- Live camera feed.
+- FPS dan status koneksi.
+- Hasil deteksi aktif.
+- Nama produk dan teks OCR.
+- Confidence YOLO, sudut OCR, match score, dan match type.
+- Gauge kadar gula.
+- Statistik deteksi hari ini.
+- Screenshot freeze frame.
+- Riwayat 20 deteksi terbaru.
+
+> Jangan menjalankan `detect.py` dan `app.py` secara bersamaan apabila keduanya menggunakan webcam yang sama.
 
 ## Database Produk
 
-Database berada di `database/beverages.json` dan berbentuk JSON list. Setiap item wajib memiliki:
-
-- `name`: nama produk utama.
-- `aliases`: daftar alias brand/varian dan kemungkinan salah baca OCR.
-- `sugar_g`: kadar gula dalam gram.
-
-Contoh:
+Database disimpan dalam `database/beverages.json`. Setiap produk minimal memiliki field berikut:
 
 ```json
 {
   "name": "ABC COFFEE",
-  "aliases": ["ABC", "A8C", "ABC COFFEE", "ABC CHOCO MALT COFFEE"],
+  "aliases": [
+    "ABC",
+    "A8C",
+    "ABC COFFEE",
+    "ABC CHOCO MALT COFFEE"
+  ],
   "sugar_g": 17
 }
 ```
 
-Field `status` tidak perlu ditulis karena status dihitung otomatis:
+Keterangan:
 
-- `sugar_g < 10`: **Aman**
-- `10 <= sugar_g <= 20`: **Batas Wajar**
-- `sugar_g > 20`: **Tidak Disarankan**
+| Field | Fungsi |
+| --- | --- |
+| `name` | Nama utama produk |
+| `aliases` | Variasi nama dan kemungkinan kesalahan OCR |
+| `sugar_g` | Kandungan gula dalam gram |
 
-Alias dibuat spesifik agar kata umum seperti `COFFEE`, `TEA`, `MILK`, `ORANGE`, atau `STRAWBERRY` tidak langsung menyebabkan salah identifikasi produk.
+Status dihitung otomatis berdasarkan konfigurasi proyek:
 
-## Konfigurasi Penting
+| Kadar gula | Status |
+| --- | --- |
+| `< 10 gram` | Aman |
+| `10–20 gram` | Batas Wajar |
+| `> 20 gram` | Tidak Disarankan |
 
-Pengaturan utama ada di `config/settings.py`.
+Alias sebaiknya dibuat spesifik. Kata umum seperti `COFFEE`, `TEA`, `MILK`, `WATER`, atau `DRINK` tidak cukup untuk menentukan satu produk.
 
-| Setting | Default | Keterangan |
-| --- | --- | --- |
-| `MODEL_PATH` | `model/best.pt` | Path model YOLO11 |
-| `DATABASE_PATH` | `database/beverages.json` | Path database produk |
-| `CAMERA_INDEX` | `1` | Index webcam OpenCV |
-| `FRAME_WIDTH` / `FRAME_HEIGHT` | `640` / `480` | Resolusi webcam |
+## Konfigurasi
+
+Pengaturan utama berada pada `config/settings.py`.
+
+| Konfigurasi | Default | Keterangan |
+| --- | ---: | --- |
+| `MODEL_PATH` | `model/best.pt` | Lokasi model YOLO11 |
+| `DATABASE_PATH` | `database/beverages.json` | Lokasi database produk |
+| `CAMERA_INDEX` | `0` | Index webcam OpenCV |
+| `FRAME_WIDTH` | `640` | Lebar frame kamera |
+| `FRAME_HEIGHT` | `480` | Tinggi frame kamera |
 | `CONFIDENCE_THRESHOLD` | `0.60` | Minimum confidence YOLO |
 | `IOU_THRESHOLD` | `0.45` | Threshold IoU YOLO |
-| `TARGET_CLASS_NAME` | `bottle` | Class target deteksi |
-| `OCR_LANGUAGES` | `["en"]` | Bahasa OCR Latin label minuman |
-| `OCR_GPU` | `False` | EasyOCR CPU by default |
-| `OCR_MIN_CONFIDENCE` | `0.40` | Minimum confidence OCR per kata |
-| `OCR_ROTATION_ENABLED` | `True` | Aktifkan OCR pada crop asli dan rotasi |
-| `OCR_ROTATION_ANGLES` | `[0, 90, 180, 270]` | Sudut OCR untuk label horizontal, vertikal, dan terbalik |
+| `TARGET_CLASS_NAME` | `bottle` | Nama class target |
+| `OCR_LANGUAGES` | `["en"]` | Bahasa EasyOCR |
+| `OCR_GPU` | `False` | Menjalankan OCR menggunakan CPU |
+| `OCR_MIN_CONFIDENCE` | `0.40` | Minimum confidence kata OCR |
+| `OCR_ROTATION_ANGLES` | `[0, 90, 180, 270]` | Sudut pengujian OCR |
 | `FUZZY_MATCH_THRESHOLD` | `0.72` | Ambang fuzzy matching |
-| `DETECTION_COOLDOWN_SECONDS` | `3` | Jeda agar OCR tidak berjalan setiap frame |
-| `FREEZE_DURATION_SECONDS` | `5` | Durasi freeze saat produk dikenali |
-| `SCREENSHOT_ENABLED` | `True` | Screenshot otomatis |
+| `DETECTION_COOLDOWN_SECONDS` | `3` | Jeda antarproses OCR |
+| `FREEZE_DURATION_SECONDS` | `5` | Durasi freeze frame |
+| `SCREENSHOT_ENABLED` | `True` | Mengaktifkan screenshot otomatis |
+| `WEB_HOST` | `0.0.0.0` | Host server Flask |
+| `WEB_PORT` | `5000` | Port dashboard |
+| `STREAM_QUALITY` | `70` | Kualitas JPEG pada MJPEG stream |
+| `MAX_HISTORY` | `50` | Batas riwayat dalam memori |
 
-## Output Runtime
+## Endpoint Dashboard
 
-- **Window OpenCV** menampilkan bounding box botol, confidence YOLO, FPS, OCR text, nama produk, kadar gula, status, dan banner freeze.
-- **Screenshot** produk dikenali disimpan ke folder `screenshot/`.
-- **Log CSV** disimpan ke folder `logs/` dengan kolom timestamp, nama produk, OCR text, gula, status, confidence YOLO, match score, match type, dan path screenshot.
+| Endpoint | Fungsi |
+| --- | --- |
+| `/` | Menampilkan halaman dashboard |
+| `/video_feed` | Mengirim live stream MJPEG |
+| `/events` | Mengirim status real-time melalui SSE |
+| `/api/stats` | Mengambil statistik deteksi hari ini |
+| `/api/history` | Mengambil 20 riwayat terbaru |
+| `/screenshot/<filename>` | Menampilkan screenshot deteksi |
 
-## Fitur OCR Rotation
+## Output Program
 
-Label botol kadang terlihat tegak/vertikal, misalnya tulisan **TEBS** yang diputar 90 derajat. `BeverageOCR` mencoba OCR pada sudut `0`, `90`, `180`, dan `270` derajat, lalu memilih hasil dengan jumlah kata valid terbanyak. Jika jumlah kata sama, hasil dengan total confidence OCR tertinggi dipakai. Dengan cara ini teks horizontal, vertikal dari bawah ke atas, vertikal dari atas ke bawah, dan teks terbalik 180 derajat tetap punya peluang terbaca.
+### Screenshot
 
-## Fitur Text Cleaning
+Hasil pengenalan produk disimpan otomatis ke:
 
-`ocr/text_cleaner.py` mengubah teks menjadi uppercase, menghapus simbol yang tidak diperlukan, merapikan spasi, dan memperbaiki salah baca umum seperti `A8C`, `C0CA`, `C0LA`, `G0LDA`, `FANT4`, dan `SPR1TE`. Modul ini juga menandai teks yang terlalu umum, sehingga OCR yang hanya membaca `COFFEE`, `TEA`, `MILK`, `WATER`, atau `DRINK` tidak langsung dipilih sebagai produk tertentu.
+```text
+screenshot/
+```
 
-## Catatan Matching OCR
+### Log CSV
 
-- `A8C` dinormalisasi menjadi `ABC` dan cocok ke **ABC COFFEE**.
-- `G0LDA` dinormalisasi menjadi `GOLDA` dan cocok ke **GOLDA**.
-- `C0CA C0LA` dinormalisasi menjadi `COCA COLA`.
-- `TEBS`, `TEBS TEA`, atau `TEBS SPARKLING` cocok ke **TEBS**.
-- OCR yang hanya berisi kata umum seperti `COFFEE` atau `TEA` akan ditampilkan sebagai **Tidak dikenali**.
+Riwayat deteksi disimpan ke:
+
+```text
+logs/detections_YYYYMMDD.csv
+```
+
+Data log mencakup timestamp, nama produk, teks OCR, kadar gula, status, confidence YOLO, match score, match type, dan lokasi screenshot.
+
+## Optimasi Deteksi
+
+Untuk memperoleh hasil yang lebih stabil:
+
+1. Arahkan sisi label produk ke kamera.
+2. Hindari pantulan cahaya langsung pada botol.
+3. Gunakan latar belakang yang tidak terlalu ramai.
+4. Tempatkan botol cukup dekat agar teks terlihat jelas.
+5. Ubah `CAMERA_INDEX` apabila webcam yang terbuka bukan kamera yang diinginkan.
+6. Naikkan `DETECTION_COOLDOWN_SECONDS` untuk mengurangi beban OCR.
+7. Aktifkan `OCR_GPU` hanya jika lingkungan PyTorch dan GPU mendukungnya.
+
+## Pemecahan Masalah
+
+### Kamera tidak tersedia
+
+Ubah index kamera pada `config/settings.py`:
+
+```python
+CAMERA_INDEX = 0
+```
+
+Coba nilai `1` atau `2` jika menggunakan webcam eksternal. Pastikan kamera tidak sedang dipakai OBS, browser, Zoom, atau aplikasi lain.
+
+### Model tidak ditemukan
+
+Pastikan file tersedia pada:
+
+```text
+model/best.pt
+```
+
+### OCR lambat
+
+EasyOCR pertama kali memerlukan waktu untuk memuat model. Gunakan resolusi kamera yang lebih rendah, tambah cooldown OCR, atau aktifkan GPU pada perangkat yang kompatibel.
+
+### Dashboard terbuka tetapi video tidak muncul
+
+Periksa terminal untuk memastikan kamera dan model berhasil dimuat. Pastikan endpoint `http://localhost:5000/video_feed` dapat diakses dan webcam tidak digunakan program lain.
+
+## Catatan
+
+Kategori kadar gula pada proyek ini merupakan aturan keputusan yang digunakan untuk kebutuhan penelitian dan demonstrasi sistem. Hasilnya tidak menggantikan informasi nilai gizi resmi pada kemasan maupun rekomendasi tenaga kesehatan.
+
+## Pengembang
+
+**Gusli Yanza**  
+Program Studi Sistem Komputer  
+GitHub: [@Gslza](https://github.com/Gslza)
