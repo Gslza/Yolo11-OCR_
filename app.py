@@ -171,10 +171,13 @@ class CameraThread(threading.Thread):
             capture = open_camera()
 
             last_result: dict[str, object] | None = None
+            last_detected_product: str | None = None
             freeze_until = 0.0
             freeze_frame: np.ndarray | None = None
             fps = 0.0
             previous_frame_time = time.monotonic()
+            frame_counter = 0
+            cached_detection: tuple[list[float], float] | None = None
 
             while not stop_event.is_set():
                 now = time.monotonic()
@@ -200,19 +203,30 @@ class CameraThread(threading.Thread):
                         time.sleep(0.5)
                         continue
 
+                    frame_counter += 1
+                    run_yolo = (frame_counter % settings.YOLO_SKIP_FRAMES == 0) or cached_detection is None
+
                     # Run YOLO and coordinate with background OCR
-                    display_frame, product, confidence, recognized_now = process_frame(
+                    display_frame, product, confidence, recognized_now, cached_detection = process_frame(
                         frame,
                         model,
                         ocr_worker,
                         logger,
                         last_result,
+                        last_detected_product,
+                        cached_detection=cached_detection,
+                        run_yolo=run_yolo,
                     )
                     last_result = product
 
                     if recognized_now:
+                        current_product_name = product.get("name") if product else None
+                        last_detected_product = current_product_name
                         freeze_frame = display_frame.copy()
                         freeze_until = time.monotonic() + settings.FREEZE_DURATION_SECONDS
+                    
+                    if confidence is None:
+                        last_detected_product = None
 
                 # Draw FPS on the display frame
                 draw_fps(display_frame, fps)

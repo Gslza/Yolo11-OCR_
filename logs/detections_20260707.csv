@@ -1,0 +1,4 @@
+timestamp,product_name,ocr_text,sugar_g,status,yolo_confidence,match_score,match_type,screenshot_path
+2026-07-07T09:56:35,LE MINERALE,LE MINERALE,0.0,Aman,0.7496,1.0,exact,D:\Yolo11-OCR_\Yolo11-OCR_\screenshot\20260707_095635_352290_LE_MINERALE.jpg
+2026-07-07T10:08:04,FRESTEA,FTES TEA,20.0,Batas Wajar,0.6050,0.875,fuzzy:FRES TEA,D:\Yolo11-OCR_\Yolo11-OCR_\screenshot\20260707_100804_933592_FRESTEA.jpg
+2026-07-07T20:41:09,TEBS,TEBS,20.0,Batas Wajar,0.8565,1.0,exact,D:\Yolo11-OCR_\Yolo11-OCR_\screenshot\20260707_204109_453709_TEBS.jpg

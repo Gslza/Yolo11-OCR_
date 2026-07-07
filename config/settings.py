@@ -27,7 +27,12 @@ OCR_GPU = False
 OCR_MIN_CONFIDENCE = 0.40
 OCR_RESIZE_WIDTH = 640
 OCR_ROTATION_ENABLED = True
-OCR_ROTATION_ANGLES = [0, 90, 180, 270]
+OCR_ROTATION_ANGLES = [0, 90, 270]
+OCR_EARLY_EXIT_WORDS = 3  # Skip remaining rotations if this many words found
+
+# Performance optimization
+YOLO_SKIP_FRAMES = 2      # Run YOLO every N frames (1 = no skip, reuse last bbox)
+YOLO_INFER_WIDTH = 320    # Downscale frame width for YOLO (smaller = faster, less accurate)
 
 # Product matching settings
 FUZZY_MATCH_THRESHOLD = 0.72

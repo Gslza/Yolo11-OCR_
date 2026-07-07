@@ -71,9 +71,24 @@ def is_bottle_detection(model: YOLO, class_id: int) -> bool:
 
 
 def find_best_bottle_detection(model: YOLO, frame: np.ndarray) -> tuple[list[float], float] | None:
-    """Run YOLO and return the highest-confidence bottle detection."""
+    """Run YOLO and return the highest-confidence bottle detection.
+
+    The frame is downscaled to ``YOLO_INFER_WIDTH`` before inference to reduce
+    computation cost.  Bounding-box coordinates are scaled back to the original
+    resolution so callers can use them directly.
+    """
+    h, w = frame.shape[:2]
+    infer_w = settings.YOLO_INFER_WIDTH
+    if infer_w < w:
+        scale = w / infer_w
+        infer_h = int(h / scale)
+        small = cv2.resize(frame, (infer_w, infer_h), interpolation=cv2.INTER_LINEAR)
+    else:
+        small = frame
+        scale = 1.0
+
     yolo_results = model.predict(
-        frame,
+        small,
         conf=settings.CONFIDENCE_THRESHOLD,
         iou=settings.IOU_THRESHOLD,
         verbose=False,
@@ -86,7 +101,7 @@ def find_best_bottle_detection(model: YOLO, frame: np.ndarray) -> tuple[list[flo
             class_id = int(box.cls[0])
             if confidence < settings.CONFIDENCE_THRESHOLD or not is_bottle_detection(model, class_id):
                 continue
-            bbox = box.xyxy[0].tolist()
+            bbox = [v * scale for v in box.xyxy[0].tolist()]
             if best_detection is None or confidence > best_detection[1]:
                 best_detection = (bbox, confidence)
     return best_detection
@@ -143,16 +158,25 @@ def process_frame(
     ocr_worker: OCRWorker,
     logger: DetectionLogger,
     last_result: dict[str, object] | None,
-) -> tuple[np.ndarray, dict[str, object] | None, float | None, bool]:
-    """Run YOLO every frame; OCR runs in a background thread without blocking."""
-    rendered = frame.copy()
-    detection = find_best_bottle_detection(model, frame)
+    last_detected_product: str | None = None,
+    cached_detection: tuple[list[float], float] | None = None,
+    run_yolo: bool = True,
+) -> tuple[np.ndarray, dict[str, object] | None, float | None, bool, tuple[list[float], float] | None]:
+    """Process a single frame.  YOLO runs only when *run_yolo* is True;
+    otherwise the previous *cached_detection* is reused to save time.
+    OCR runs in a background thread without blocking.
+    """
+    if run_yolo:
+        detection = find_best_bottle_detection(model, frame)
+    else:
+        detection = cached_detection
 
     if detection is None:
-        return draw_info_panel(rendered, None), None, None, False
+        draw_info_panel(frame, None)
+        return frame, None, None, False, None
 
     bbox, confidence = detection
-    draw_bounding_box(rendered, bbox, confidence, settings.TARGET_CLASS_NAME)
+    draw_bounding_box(frame, bbox, confidence, settings.TARGET_CLASS_NAME)
 
     # Collect any completed background OCR result
     result = last_result
@@ -160,23 +184,26 @@ def process_frame(
     ocr_result = ocr_worker.collect()
     if ocr_result is not None:
         result = ocr_result
-        recognized_now = bool(result.get("name") != "Tidak dikenali")
+        current_product_name = result.get("name")
+        recognized_now = (current_product_name != last_detected_product and 
+                          current_product_name and 
+                          current_product_name != "Tidak dikenali")
 
     # Submit a new OCR job when the worker is idle (cooldown enforced internally)
     crop = safe_crop(frame, bbox)
     if crop is not None:
         ocr_worker.submit(crop)
 
-    rendered = draw_info_panel(rendered, result, confidence)
+    draw_info_panel(frame, result, confidence)
     if recognized_now and result is not None:
         screenshot_path = None
         if settings.SCREENSHOT_ENABLED:
-            screenshot_path = save_detection_screenshot(rendered, settings.SCREENSHOT_DIR, str(result["name"]))
+            screenshot_path = save_detection_screenshot(frame, settings.SCREENSHOT_DIR, str(result["name"]))
             if isinstance(result, dict) and screenshot_path:
                 result["screenshot_path"] = str(screenshot_path)
                 result["screenshot_filename"] = screenshot_path.name
         logger.log_detection(confidence, result, screenshot_path)
-    return rendered, result, confidence, recognized_now
+    return frame, result, confidence, recognized_now, detection
 
 
 def main() -> int:
@@ -191,10 +218,13 @@ def main() -> int:
         capture = open_camera()
 
         last_result: dict[str, object] | None = None
+        last_detected_product: str | None = None
         freeze_until = 0.0
         freeze_frame: np.ndarray | None = None
         fps = 0.0
         previous_frame_time = time.monotonic()
+        frame_counter = 0
+        cached_detection: tuple[list[float], float] | None = None
 
         while True:
             now = time.monotonic()
@@ -213,17 +243,29 @@ def main() -> int:
                 if not ok:
                     raise RuntimeError("Gagal membaca frame dari kamera.")
 
-                display_frame, product, _, recognized_now = process_frame(
+                frame_counter += 1
+                run_yolo = (frame_counter % settings.YOLO_SKIP_FRAMES == 0) or cached_detection is None
+
+                display_frame, product, confidence, recognized_now, cached_detection = process_frame(
                     frame,
                     model,
                     ocr_worker,
                     logger,
                     last_result,
+                    last_detected_product,
+                    cached_detection=cached_detection,
+                    run_yolo=run_yolo,
                 )
                 last_result = product
+                
                 if recognized_now:
+                    current_product_name = product.get("name") if product else None
+                    last_detected_product = current_product_name
                     freeze_frame = display_frame.copy()
                     freeze_until = time.monotonic() + settings.FREEZE_DURATION_SECONDS
+                
+                if confidence is None:
+                    last_detected_product = None
 
             draw_fps(display_frame, fps)
             cv2.imshow(settings.WINDOW_NAME, display_frame)

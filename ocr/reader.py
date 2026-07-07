@@ -95,7 +95,13 @@ class BeverageOCR:
         }
 
     def read_text_with_rotation(self, crop: np.ndarray) -> dict[str, object]:
-        """Try EasyOCR at configured rotations and select by word count then confidence."""
+        """Try EasyOCR at configured rotations and select by word count then confidence.
+
+        Applies two speed optimisations:
+        * **Early exit** – stop rotating once we find ≥ ``OCR_EARLY_EXIT_WORDS`` words.
+        * **Skip preprocessed pass** – only run on preprocessed image when the
+          original pass yielded no text at all.
+        """
         if crop is None or crop.size == 0:
             return {"text": "", "word_count": 0, "total_confidence": 0.0, "angle": 0}
 
@@ -107,7 +113,11 @@ class BeverageOCR:
             result["angle"] = int(angle)
             if self._is_better_ocr_result(result, best_result):
                 best_result = result
+            # Early exit: enough words found, skip remaining rotations
+            if int(best_result.get("word_count", 0)) >= settings.OCR_EARLY_EXIT_WORDS:
+                return best_result
 
+        # Only run preprocessed pass when original rotations yielded nothing
         if not best_result.get("text"):
             processed = preprocess_crop(crop)
             for angle in angles:
@@ -117,6 +127,8 @@ class BeverageOCR:
                 result["preprocessed"] = True
                 if self._is_better_ocr_result(result, best_result):
                     best_result = result
+                if int(best_result.get("word_count", 0)) >= settings.OCR_EARLY_EXIT_WORDS:
+                    return best_result
         return best_result
 
     def read_text(self, crop: np.ndarray) -> str:
