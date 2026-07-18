@@ -263,7 +263,7 @@
       "NU GREEN",
       "NU GR33N TEA"
     ],
-    "sugar_g": 15
+    "sugar_g": 21
   },
   {
     "name": "BEAR BRAND",
@@ -318,7 +318,7 @@
       "Nii MILK",
       "Nii M1LK TEA"
     ],
-    "sugar_g": 15
+    "sugar_g": 21
   },
   {
     "name": "MILO",
@@ -398,5 +398,221 @@
       "BOOSI SUSU"
     ],
     "sugar_g": 21
+  },
+  {
+    "name" : "Nestle Pure Life",
+    "aliases":[
+      "NESTLE PURE LIFE",
+      "PURE LIFE",
+      "PURELIFE"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "CLEO",
+    "aliases": [
+      "CLEO",
+      "CLE0",
+      "CLEO PURE WATER"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "PRISTINE",
+    "aliases": [
+      "PRISTINE",
+      "PRISTINE 8.6+",
+      "PRISTINE 8.6",
+      "PR1STINE"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "VIT",
+    "aliases": [
+      "VIT",
+      "VIT AIR MINERAL",
+      "V1T"
+    ],
+    "sugar_g": 0
+  },
+  {
+    "name": "ISOPLUS",
+    "aliases": [
+      "ISOPLUS",
+      "1SOPLUS",
+      "ISOPLUS ISOTONIC"
+    ],
+    "sugar_g": 10
+  },
+  {
+    "name": "BIG COLA",
+    "aliases": [
+      "BIG COLA",
+      "BIGCOLA",
+      "BIG C0LA",
+      "B1G COLA"
+    ],
+    "sugar_g": 25
+  },
+  {
+    "name": "LARUTAN PENYEGAR",
+    "aliases": [
+      "LARUTAN PENYEGAR",
+      "LARUTAN PENYEGAR CAP BADAK",
+      "CAP BADAK",
+      "LARUTAN"
+    ],
+    "sugar_g": 14
+  },
+  {
+    "name": "ADES",
+    "aliases": ["ADES", "ADES MINERAL WATER", "4DES"],
+    "sugar_g": 0
+  },
+  {
+    "name": "OASIS",
+    "aliases": ["OASIS", "OASIS WATER", "0ASIS"],
+    "sugar_g": 0
+  },
+  {
+    "name": "AMIDIS",
+    "aliases": ["AMIDIS", "AMIDIS DISTILLED WATER", "AM1DIS"],
+    "sugar_g": 0
+  },
+  {
+    "name": "CLUB",
+    "aliases": ["CLUB", "CLUB MINERAL WATER"],
+    "sugar_g": 0
+  },
+  {
+    "name": "EQUIL",
+    "aliases": ["EQUIL", "EQUIL MINERAL WATER", "EQU1L"],
+    "sugar_g": 0
+  },
+  {
+    "name": "EVIAN",
+    "aliases": ["EVIAN", "EVIAN NATURAL MINERAL WATER"],
+    "sugar_g": 0
+  },
+  {
+    "name": "AW ROOT BEER",
+    "aliases": ["AW", "A&W", "AW ROOT BEER", "A&W ROOT BEER", "ROOT BEER"],
+    "sugar_g": 34
+  },
+  {
+    "name": "PEPSI",
+    "aliases": ["PEPSI", "PEPSI COLA", "PEPS1"],
+    "sugar_g": 41
+  },
+  {
+    "name": "MIRINDA",
+    "aliases": ["MIRINDA", "M1RINDA"],
+    "sugar_g": 35
+  },
+  {
+    "name": "7 UP",
+    "aliases": ["7 UP", "7UP", "SEVEN UP"],
+    "sugar_g": 38
+  },
+  {
+    "name": "GREEN SANDS",
+    "aliases": ["GREEN SANDS", "GREENSANDS", "GREEN SAND"],
+    "sugar_g": 20
+  },
+  {
+    "name": "KRATINGDAENG",
+    "aliases": ["KRATINGDAENG", "KRATING DAENG"],
+    "sugar_g": 27
+  },
+  {
+    "name": "RED BULL",
+    "aliases": ["RED BULL", "REDBULL", "RED-BULL"],
+    "sugar_g": 27
+  },
+  {
+    "name": "MONSTER ENERGY",
+    "aliases": ["MONSTER", "MONSTER ENERGY", "MONSTER-ENERGY"],
+    "sugar_g": 54
+  },
+  {
+    "name": "PANTHER ENERGY",
+    "aliases": ["PANTHER", "PANTHER ENERGY", "PANTHER-ENERGY"],
+    "sugar_g": 15
+  },
+  {
+    "name": "HEMAVITON",
+    "aliases": ["HEMAVITON", "HEMAVITON JRENG", "HEMAVITON ACTION"],
+    "sugar_g": 15
+  },
+  {
+    "name": "COOLANT",
+    "aliases": ["COOLANT", "C00LANT"],
+    "sugar_g": 12
+  },
+  {
+    "name": "FATIGON HYDRO",
+    "aliases": ["FATIGON", "FATIGON HYDRO"],
+    "sugar_g": 10
+  },
+  {
+    "name": "MYTEA",
+    "aliases": ["MYTEA", "MY TEA", "SUNTORY MYTEA", "MYT3A"],
+    "sugar_g": 15
+  },
+  {
+    "name": "ITO EN",
+    "aliases": ["ITO EN", "ITOEN", "OI OCHA", "ITO EN OI OCHA"],
+    "sugar_g": 0
+  },
+  {
+    "name": "S TEE",
+    "aliases": ["S TEE", "STEE", "S-TEE"],
+    "sugar_g": 15
+  },
+  {
+    "name": "CAP PANDA",
+    "aliases": ["CAP PANDA", "LIANG TEH CAP PANDA", "CAPPANDA"],
+    "sugar_g": 18
+  },
+  {
+    "name": "YEO'S",
+    "aliases": ["YEO'S", "YEOS", "YEO'S CHRYSANTHEMUM", "YEO'S SOYA"],
+    "sugar_g": 16
+  },
+  {
+    "name": "SARI KACANG IJO ULTRA",
+    "aliases": ["SARI KACANG IJO", "ULTRA SARI KACANG IJO", "SARI KACANG HIJAU"],
+    "sugar_g": 20
+  },
+  {
+    "name": "FRISIAN FLAG",
+    "aliases": ["FRISIAN FLAG", "FRISIANFLAG", "SUSU BENDERA", "FRISIAN FLAG SUSU CAIR"],
+    "sugar_g": 18
+  },
+  {
+    "name": "OVALTINE",
+    "aliases": ["OVALTINE", "OVALT1NE", "OVALTINE SWISS"],
+    "sugar_g": 15
+  },
+  {
+    "name": "CHIL GO",
+    "aliases": ["CHIL GO", "CHILGO", "CHIL-GO", "MORINAGA CHIL GO"],
+    "sugar_g": 10
+  },
+  {
+    "name": "KIRANTI",
+    "aliases": ["KIRANTI", "KIRANT1"],
+    "sugar_g": 12
+  },
+  {
+    "name": "LASEGAR",
+    "aliases": ["LASEGAR", "L4SEGAR"],
+    "sugar_g": 14
+  },
+  {
+    "name": "ION WATER",
+    "aliases": ["ION WATER", "POCARI SWEAT ION WATER", "IONWATER"],
+    "sugar_g": 5
   }
 ]
