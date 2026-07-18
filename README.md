@@ -318,5 +318,7 @@ Kategori kadar gula pada proyek ini merupakan aturan keputusan yang digunakan un
 ## Pengembang
 
 **Gusli Yanza**  
+**Basuki Rahmat**
+**Veryn Reviera Aiga**
 Program Studi Sistem Komputer  
 GitHub: [@Gslza](https://github.com/Gslza)
