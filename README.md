@@ -21,18 +21,30 @@ Sistem **computer vision** untuk mendeteksi botol minuman menggunakan **YOLO11**
 ## Alur Kerja Sistem
 
 ```mermaid
-flowchart LR
-    A[Webcam] --> B[YOLO11 Detection]
-    B --> C[Bounding Box Botol]
-    C --> D[Safe Crop]
-    D --> E[EasyOCR Multi-Rotation]
-    E --> F[Text Cleaning]
-    F --> G[Product Matching]
-    G --> H[Database Minuman]
-    G --> I[Analisis Kadar Gula]
-    I --> J[Desktop OpenCV]
-    I --> K[Dashboard Flask]
-    I --> L[Screenshot dan Log CSV]
+flowchart TD
+    A([Mulai]) --> B[Aktifkan Kamera]
+    B --> C[/Ambil Frame Video/]
+    C --> D[Deteksi Botol Menggunakan YOLO11]
+    D --> E{Apakah Botol Terdeteksi?}
+    E -->|Tidak| F[Kembali Mengambil Frame Video]
+    F --> C
+    E -->|Ya| G[Crop Area Botol atau Label]
+    G --> H[/EasyOCR Membaca Teks Label/]
+    H --> I[Pencocokan Hasil OCR dengan Database Produk]
+    DB{{Database Produk}} -.-> I
+    I --> J{Apakah Produk Ditemukan?}
+    J -->|Tidak| K>Tampilkan Data Tidak Tersedia]
+    K --> L{Kembali ke Kamera atau Selesai?}
+    L -->|Kembali ke Kamera| C
+    L -->|Selesai| Z([Selesai])
+    J -->|Ya| M[/Ambil Informasi Kadar Gula/]
+    M --> N[Hitung Total Gula per Kemasan]
+    N --> O[[Decision System]]
+    O --> P>Tampilkan Hasil]
+    P --> Q[Freeze Screen dan Simpan Screenshot]
+    Q --> R{Kembali ke Kamera atau Selesai?}
+    R -->|Kembali ke Kamera| C
+    R -->|Selesai| Z
 ```
 
 Proses utama sistem:
@@ -178,40 +190,6 @@ Dashboard menampilkan:
 
 > Jangan menjalankan `detect.py` dan `app.py` secara bersamaan apabila keduanya menggunakan webcam yang sama.
 
-## Database Produk
-
-Database disimpan dalam `database/beverages.json`. Setiap produk minimal memiliki field berikut:
-
-```json
-{
-  "name": "ABC COFFEE",
-  "aliases": [
-    "ABC",
-    "A8C",
-    "ABC COFFEE",
-    "ABC CHOCO MALT COFFEE"
-  ],
-  "sugar_g": 17
-}
-```
-
-Keterangan:
-
-| Field | Fungsi |
-| --- | --- |
-| `name` | Nama utama produk |
-| `aliases` | Variasi nama dan kemungkinan kesalahan OCR |
-| `sugar_g` | Kandungan gula dalam gram |
-
-Status dihitung otomatis berdasarkan konfigurasi proyek:
-
-| Kadar gula | Status |
-| --- | --- |
-| `< 10 gram` | Aman |
-| `10–20 gram` | Batas Wajar |
-| `> 20 gram` | Tidak Disarankan |
-
-Alias sebaiknya dibuat spesifik. Kata umum seperti `COFFEE`, `TEA`, `MILK`, `WATER`, atau `DRINK` tidak cukup untuk menentukan satu produk.
 
 ## Konfigurasi
 
@@ -283,42 +261,10 @@ Untuk memperoleh hasil yang lebih stabil:
 6. Naikkan `DETECTION_COOLDOWN_SECONDS` untuk mengurangi beban OCR.
 7. Aktifkan `OCR_GPU` hanya jika lingkungan PyTorch dan GPU mendukungnya.
 
-## Pemecahan Masalah
-
-### Kamera tidak tersedia
-
-Ubah index kamera pada `config/settings.py`:
-
-```python
-CAMERA_INDEX = 0
-```
-
-Coba nilai `1` atau `2` jika menggunakan webcam eksternal. Pastikan kamera tidak sedang dipakai OBS, browser, Zoom, atau aplikasi lain.
-
-### Model tidak ditemukan
-
-Pastikan file tersedia pada:
-
-```text
-model/best.pt
-```
-
-### OCR lambat
-
-EasyOCR pertama kali memerlukan waktu untuk memuat model. Gunakan resolusi kamera yang lebih rendah, tambah cooldown OCR, atau aktifkan GPU pada perangkat yang kompatibel.
-
-### Dashboard terbuka tetapi video tidak muncul
-
-Periksa terminal untuk memastikan kamera dan model berhasil dimuat. Pastikan endpoint `http://localhost:5000/video_feed` dapat diakses dan webcam tidak digunakan program lain.
-
-## Catatan
-
-Kategori kadar gula pada proyek ini merupakan aturan keputusan yang digunakan untuk kebutuhan penelitian dan demonstrasi sistem. Hasilnya tidak menggantikan informasi nilai gizi resmi pada kemasan maupun rekomendasi tenaga kesehatan.
 
 ## Pengembang
 
-**Gusli Yanza**  
-**Basuki Rahmat**
-**Veryn Reviera Aiga**
+**Gusli Yanza**  GitHub: [@Gslza](https://github.com/Gslza)
+**Basuki Rahmat**  GitHub: [@Gslza](https://github.com/kazzuxy)
+**Veryn Reviera Aiga**  GitHub: [@Gslza](https://github.com/Veryn7)
 Program Studi Sistem Komputer  
-GitHub: [@Gslza](https://github.com/Gslza)
