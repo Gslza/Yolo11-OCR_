@@ -265,6 +265,6 @@ Untuk memperoleh hasil yang lebih stabil:
 ## Pengembang
 
 **Gusli Yanza**  GitHub: [@Gslza](https://github.com/Gslza)
-**Basuki Rahmat**  GitHub: [@Gslza](https://github.com/kazzuxy)
-**Veryn Reviera Aiga**  GitHub: [@Gslza](https://github.com/Veryn7)
+**Basuki Rahmat**  GitHub: [@Basuki](https://github.com/kazzuxy)
+**Veryn Reviera Aiga**  GitHub: [@Veryn](https://github.com/Veryn7)
 Program Studi Sistem Komputer  
